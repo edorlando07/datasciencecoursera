@@ -1,0 +1,54 @@
+import urllib2
+import json
+
+f2 = open("weatherfile.txt","w")
+
+day_range = range(10)
+city_urls = [
+            'http://api.wunderground.com/api/cb8d75#####/forecast10day/q/IL/Chicago.json',
+            'http://api.wunderground.com/api/cb8d75#####/forecast10day/q/TN/Nashville.json'
+            ]
+
+titles = "state|city|pretty_n|epoch_n|year_n|month_n|day_n|period_n|high_n|low_n|conditions_n|qpf_allday_n|snow_allday_n|avewind_n|avehumidity_n" + "\n"
+print titles
+f2.write(titles)
+
+
+for url_ in city_urls:
+
+    state_beg = "/q/"
+    city_end = ".json"
+
+    state_beg_int = url_.find(state_beg) + 3
+    state_end_int = url_.find(state_beg) + 5
+
+    city_beg_int = url_.find(state_beg) + 6
+    city_end_int = url_.find(city_end)
+
+
+    f = urllib2.urlopen(url_)
+    json_string = f.read()
+
+    parsed_json = json.loads(json_string)
+
+    for date_n in day_range:
+        pretty_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['date']['pretty']
+        epoch_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['date']['epoch']
+        year_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['date']['year']
+        month_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['date']['month']
+        day_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['date']['day']
+        period_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['period']
+        high_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['high']['fahrenheit']
+        low_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['low']['fahrenheit']
+        conditions_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['conditions']
+        qpf_allday_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['qpf_allday']['in']
+        snow_allday_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['snow_allday']['in']
+        avewind_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['avewind']['mph']
+        avehumidity_n = parsed_json['forecast']['simpleforecast']['forecastday'][date_n]['avehumidity']
+
+        data_line = str(url_[state_beg_int:state_end_int]) +"|" + str(url_[city_beg_int:city_end_int]) + "|" + str(pretty_n) + "|" + str(epoch_n) + "|" + str(year_n) + "|" + str(month_n) + "|" + str(day_n) + "|" + str(period_n) + "|" + str(high_n) + "|" + str(low_n) + "|" + str(conditions_n) + "|" + str(qpf_allday_n) + "|" + str(snow_allday_n) + "|" + str(avewind_n) + "|" + str(avehumidity_n) + "\n"
+        print data_line
+        f2.writelines(data_line)
+
+f.close() 
+f2.close() 
